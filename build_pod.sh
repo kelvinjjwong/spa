@@ -110,6 +110,18 @@ if [[ ! -e Package.swift ]]; then
     sed -i '' -e "s/PROJECT_NAME/${GIT_REPOSITORY}/" Package.swift
 fi
 
+if [[ ! -e Sources/${GIT_REPOSITORY}/ ]]; then
+    mkdir -p Sources/${GIT_REPOSITORY}/
+    curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/PROJECT_NAME.swift > Sources/${GIT_REPOSITORY}/${GIT_REPOSITORY}.swift
+    sed -i '' -e "s/PROJECT_NAME/${GIT_REPOSITORY}/" Sources/${GIT_REPOSITORY}/${GIT_REPOSITORY}.swift
+fi
+
+if [[ ! -e Tests/${GIT_REPOSITORY}Tests/ ]]; then
+    mkdir -p Tests/${GIT_REPOSITORY}Tests/
+    curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/PROJECT_NAMETests.swift > Tests/${GIT_REPOSITORY}Tests/${GIT_REPOSITORY}Tests.swift
+    sed -i '' -e "s/PROJECT_NAME/${GIT_REPOSITORY}/" Tests/${GIT_REPOSITORY}Tests/${GIT_REPOSITORY}Tests.swift
+fi
+
 git status
 if [[ $? -ne 0 ]]; then
     git init
