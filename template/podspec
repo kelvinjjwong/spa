@@ -10,5 +10,5 @@ Pod::Spec.new do |s|
   s.swift_version = "SWIFT_VERSION"
   s.osx.deployment_target = "MACOS_VERSION"
   s.source   = { :git => "https://github.com/GIT_USER/PROJECT_NAME.git", :tag => s.version }
-  s.source_files = "Sources/PROJECT_NAME/**/*.swift"
+  s.source_files = "Sources/**/*.swift"
 end
