@@ -89,9 +89,9 @@ fi
 
 if [[ ! -e LICENSE ]]; then
     curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/LICENSE > LICENSE
-    sed -i '' e "s/kelvinjjwong/${GIT_USER}/" LICENSE
+    sed -i '' -e "s/kelvinjjwong/${GIT_USER}/" LICENSE
     CURYEAR=`date '+%Y'`
-    sed -i '' e "s/2024/${CURYEAR}/" LICENSE
+    sed -i '' -e "s/2024/${CURYEAR}/" LICENSE
 fi
 
 if [[ ! -e .gitignore ]]; then
@@ -100,18 +100,18 @@ fi
 
 if [[ ! -e ${GIT_REPOSITORY}.podspec ]]; then
     curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/podspec > ${GIT_REPOSITORY}.podspec
-    sed -i '' e "s/PROJECT_NAME/${GIT_REPOSITORY}/" ${GIT_REPOSITORY}.podspec
-    sed -i '' e "s/PROJECT_VERSION/1.0.0/" ${GIT_REPOSITORY}.podspec
-    sed -i '' e "s/GIT_USER/${GIT_USER}/" ${GIT_REPOSITORY}.podspec
-    sed -i '' e "s/GIT_EMAIL/`git config user.email`/" ${GIT_REPOSITORY}.podspec
+    sed -i '' -e "s/PROJECT_NAME/${GIT_REPOSITORY}/" ${GIT_REPOSITORY}.podspec
+    sed -i '' -e "s/PROJECT_VERSION/1.0.0/" ${GIT_REPOSITORY}.podspec
+    sed -i '' -e "s/GIT_USER/${GIT_USER}/" ${GIT_REPOSITORY}.podspec
+    sed -i '' -e "s/GIT_EMAIL/`git config user.email`/" ${GIT_REPOSITORY}.podspec
     MACOS_VERSION=`sw_vers | grep ProductVersion | awk -F' ' '{print $NF}' | awk -F'.' '{print $1".0"}'`
-    sed -i '' e "s/MACOS_VERSION/${MACOS_VERSION}/" ${GIT_REPOSITORY}.podspec
-    sed -i '' e "s/SWIFT_VERSION/5.0/" ${GIT_REPOSITORY}.podspec
+    sed -i '' -e "s/MACOS_VERSION/${MACOS_VERSION}/" ${GIT_REPOSITORY}.podspec
+    sed -i '' -e "s/SWIFT_VERSION/5.0/" ${GIT_REPOSITORY}.podspec
 fi
 
 if [[ ! -e Package.swift ]]; then
     curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/Package.swift > Package.swift
-    sed -i '' e "s/PROJECT_NAME/${GIT_REPOSITORY}/" ${GIT_REPOSITORY}.podspec
+     -e "s/PROJECT_NAME/${GIT_REPOSITORY}/" ${GIT_REPOSITORY}.podspec
 fi
 
 git status
@@ -179,8 +179,8 @@ if [[ $versionChange -ne 0 ]]; then
     fi
     echo "Current version: $PREV_VERSION"
     echo "   Next version: $NEW_VERSION"
-    sed -i '' e 's/s.version     = ".*"/s.version     = "'$NEW_VERSION'"/' $PODSPEC
-    sed -i '' e 's/"'$PREV_VERSION'"/"'$NEW_VERSION'"/g' -e 's/~> '$PREV_VERSION'/~> '$NEW_VERSION'/g' README.md
+    sed -i '' -e 's/s.version     = ".*"/s.version     = "'$NEW_VERSION'"/' $PODSPEC
+    sed -i '' -e 's/"'$PREV_VERSION'"/"'$NEW_VERSION'"/g' -e 's/~> '$PREV_VERSION'/~> '$NEW_VERSION'/g' README.md
 fi
 
 # PUSH CHANGES BEFORE POD TESTING
