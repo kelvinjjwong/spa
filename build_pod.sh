@@ -13,6 +13,10 @@ if [[ "$1" = "help" ]] || [[ "$1" = "--help" ]]  || [[ "$1" = "--?" ]]; then
    echo
    exit 0
 fi
+git status
+if [[ $? -ne 0 ]]; then
+    exit $?
+fi
 
 xcodebuild -version
 if [[ $? -ne 0 ]]; then
