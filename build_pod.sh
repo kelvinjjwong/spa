@@ -225,11 +225,6 @@ if [[ $? -eq 0 ]]; then
     if [[ $? -ne 0 ]]; then
        exit -1
     fi
-else
-    echo $? 
-    echo "You need to 'git add' and 'git commit' ALL untracked files before perform testing."
-    echo
-    exit 1
 fi
 
 # POD TESTING
