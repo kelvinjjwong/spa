@@ -1,6 +1,8 @@
 #!/bin/bash
 if [[ "$1" = "help" ]] || [[ "$1" = "--help" ]]  || [[ "$1" = "--?" ]]; then
    echo "Sample:"
+   echo "./build_pod.sh test"
+   echo
    echo "./build_pod.sh"
    echo "./build_pod.sh version up"
    echo "./build_pod.sh version up major"
@@ -12,6 +14,11 @@ if [[ "$1" = "help" ]] || [[ "$1" = "--help" ]]  || [[ "$1" = "--?" ]]; then
    echo "./build_pod.sh version down revision"
    echo
    exit 0
+fi
+
+IS_TEST=0
+if [[ "$1" = "test" ]]; then
+  IS_TEST=1
 fi
 
 xcodebuild -version
@@ -91,6 +98,22 @@ if [[ ! -e .gitignore ]]; then
     curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/.gitignore > .gitignore
 fi
 
+if [[ ! -e ${GIT_REPOSITORY}.podspec ]]; then
+    curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/podspec > ${GIT_REPOSITORY}.podspec
+    sed -ie "s/PROJECT_NAME/${GIT_REPOSITORY}/" ${GIT_REPOSITORY}.podspec
+    sed -ie "s/PROJECT_VERSION/1.0.0/" ${GIT_REPOSITORY}.podspec
+    sed -ie "s/GIT_USER/${GIT_USER}/" ${GIT_REPOSITORY}.podspec
+    sed -ie "s/GIT_EMAIL/`git config user.email`/" ${GIT_REPOSITORY}.podspec
+    MACOS_VERSION=`sw_vers | grep ProductVersion | awk -F' ' '{print $NF}' | awk -F'.' '{print $1".0"}'`
+    sed -ie "s/MACOS_VERSION/${MACOS_VERSION}/" ${GIT_REPOSITORY}.podspec
+    sed -ie "s/SWIFT_VERSION/5.0/" ${GIT_REPOSITORY}.podspec
+fi
+
+if [[ ! -e Package.swift ]]; then
+    curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/Package.swift > Package.swift
+    sed -ie "s/PROJECT_NAME/${GIT_REPOSITORY}/" ${GIT_REPOSITORY}.podspec
+fi
+
 git status
 if [[ $? -ne 0 ]]; then
     git init
@@ -102,11 +125,6 @@ if [[ $? -ne 0 ]]; then
     if [[ $? -ne 0 ]]; then
         exit $?
     fi
-fi
-
-if [[ ! -e ${GIT_REPOSITORY}.podspec ]] || [[ ! -e Package.swift ]]; then
-    echo "Need Package.swift or ${GIT_REPOSITORY}.podspec to continue, please create either one first."
-    exit 1;
 fi
 
 versionPos="revision"
@@ -137,7 +155,7 @@ fi
 
 # JUMP VERSION
 
-PODSPEC=`ls *.podspec | awk -F' ' '{print $1}' | head -1`
+PODSPEC=`${GIT_REPOSITORY}.podspec`
 PREV_VERSION=`grep s.version $PODSPEC | head -1 | awk -F' ' '{print $NF}' | sed 's/"//g'`
 
 if [[ $versionChange -ne 0 ]]; then
@@ -203,6 +221,12 @@ fi
 pod spec lint $PODSPEC --allow-warnings
 if [[ $? -ne 0 ]]; then
     exit -1
+fi
+
+if [[ $IS_TEST -ne 0 ]]; then
+    echo
+    echo "Test only, abort release procedure."
+    exit 0
 fi
 
 # RELEASE
