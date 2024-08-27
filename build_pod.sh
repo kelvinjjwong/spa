@@ -13,10 +13,6 @@ if [[ "$1" = "help" ]] || [[ "$1" = "--help" ]]  || [[ "$1" = "--?" ]]; then
    echo
    exit 0
 fi
-git status
-if [[ $? -ne 0 ]]; then
-    exit $?
-fi
 
 xcodebuild -version
 if [[ $? -ne 0 ]]; then
@@ -38,7 +34,7 @@ if [[ "`which xcodebuild`" == "" ]] || [[ "`which xcode-select`" == "" ]]; then
 fi
 
 if [[ "`which gh`" == "" ]]; then
-    echo "Github CLI is required but has not properly installed."
+    echo "GitHub CLI is required but has not properly installed."
     echo "https://cli.github.com"
     exit 1;
 else
@@ -57,7 +53,7 @@ pod trunk me
 if [[ $? -ne 0 ]]; then
   echo "Please register like below before retry: "
   echo
-  echo "pod trunk register `defaults read MobileMeAccounts Accounts | grep AccountDescription | awk -F'"' '{print $2}'` '`whoami`' --description='`hostname -s`'"
+  echo "pod trunk register `defaults read MobileMeAccounts Accounts | grep AccountDescription | awk -F'\"' '{print $2}'` '`whoami`' --description='`hostname -s`'"
   echo
   exit -1
 fi
@@ -70,6 +66,29 @@ echo "git username:    $GIT_USER"
 echo "git repository:  $GIT_REPOSITORY"
 echo "git base branch: $GIT_BASE_BRANCH"
 echo
+
+gh repo view $GIT_REPOSITORY
+if [[ $? -ne 0 ]]; then
+    gh repo create $GIT_REPOSITORY
+    if [[ $? -ne 0 ]]; then
+        echo "Unable to create repository in GitHub"
+        exit 1
+    fi
+fi
+
+if [[ ! -e README.md ]]; then
+    echo "# ${GIT_REPOSITORY}" >> README.md
+fi
+
+git status
+if [[ $? -ne 0 ]]; then
+    git init
+    git add README.md
+    git commit -m "initial commit"
+    git branch -M ${GIT_BASE_BRANCH}
+    git remote add origin git@github.com:${GIT_USER}/${GIT_REPOSITORY}.git
+    git push -u origin ${GIT_BASE_BRANCH}
+fi
 
 versionPos="revision"
 versionChange=0
