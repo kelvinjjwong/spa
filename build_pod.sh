@@ -1,13 +1,4 @@
 #!/bin/bash
-GIT_USER="kelvinjjwong"
-GIT_BASE_BRANCH="main"
-GIT_REPOSITORY="${PWD##*/}"
-if [[ "`git config remote.origin.url`" != "" ]]; then
-    GIT_ADDR=`git config remote.origin.url | awk -F':' '{print $2}'`
-    GIT_USER=`echo "$GIT_ADDR" | awk -F'/' '{print $1}'`
-    GIT_REPOSITORY=`echo "$GIT_ADDR" | tr '.' '/' | awk -F'/' '{print $2}'`
-fi
-
 if [[ "$1" = "help" ]] || [[ "$1" = "--help" ]]  || [[ "$1" = "--?" ]]; then
    echo "Sample:"
    echo "./build_pod.sh"
@@ -36,6 +27,46 @@ if [[ $? -ne 0 ]]; then
     fi
 fi
 
+if [[ "`which xcodebuild`" == "" ]] || [[ "`which xcode-select`" == "" ]]; then
+    echo "Xcode is required but has not properly installed."
+    echo "https://apps.apple.com/us/app/xcode/id497799835?mt=12"
+    exit 1;
+fi
+
+if [[ "`which gh`" == "" ]]; then
+    echo "Github CLI is required but has not properly installed."
+    echo "https://cli.github.com"
+    exit 1;
+else
+    gh --version
+fi
+
+if [[ "`which pod`" == "" ]]; then
+    echo "Cocoapods is required but has not properly installed."
+    echo "https://cocoapods.org"
+    exit 1;
+else
+    echo "Cocoapods `pod --version`"
+fi
+
+pod trunk me
+if [[ $? -ne 0 ]]; then
+  echo "Please register like below before retry: "
+  echo
+  echo "pod trunk register `defaults read MobileMeAccounts Accounts | grep AccountDescription | awk -F'"' '{print $2}'` '`whoami`' --description='`hostname -s`'"
+  echo
+  exit -1
+fi
+
+GIT_USER="grep 'user:' ~/.config/gh/hosts.yml | awk -F': ' '{print $NF}'"
+GIT_BASE_BRANCH="main"
+GIT_REPOSITORY="${PWD##*/}"
+
+echo "git username:    $GIT_USER"
+echo "git repository:  $GIT_REPOSITORY"
+echo "git base branch: $GIT_BASE_BRANCH"
+echo
+
 versionPos="revision"
 versionChange=0
 if [[ "$1 $2" = "version up" ]]; then
@@ -61,14 +92,6 @@ if [[ "$1 $2" = "version down" ]]; then
 fi
 
 
-pod trunk me
-if [[ $? -ne 0 ]]; then
-  echo "Please register like below before retry: "
-  echo
-  echo "pod trunk register `defaults read MobileMeAccounts Accounts | grep AccountDescription | awk -F'"' '{print $2}'` '`whoami`' --description='`hostname -s`'"
-  echo
-  exit -1
-fi
 
 # JUMP VERSION
 
