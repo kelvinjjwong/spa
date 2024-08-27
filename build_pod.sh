@@ -84,9 +84,9 @@ git status
 if [[ $? -ne 0 ]]; then
     git init
     git add README.md
-    git commit -m "initial commit"
     git branch -M ${GIT_BASE_BRANCH}
     git remote add origin git@github.com:${GIT_USER}/${GIT_REPOSITORY}.git
+    git commit -m "initial commit"
     git push -u origin ${GIT_BASE_BRANCH}
 fi
 
