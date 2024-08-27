@@ -195,6 +195,8 @@ if [[ ! -e Sources/${GIT_REPOSITORY}/ ]]; then
     curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/PROJECT_NAME.swift > Sources/${GIT_REPOSITORY}/${GIT_REPOSITORY}.swift
     sed -i '' -e "s/PROJECT_NAME/${GIT_REPOSITORY}/" Sources/${GIT_REPOSITORY}/${GIT_REPOSITORY}.swift
     git add Sources/${GIT_REPOSITORY}/${GIT_REPOSITORY}.swift
+    git commit -m "initial commit"
+    git push
 fi
 
 if [[ ! -e Tests/${GIT_REPOSITORY}Tests/ ]]; then
@@ -202,6 +204,8 @@ if [[ ! -e Tests/${GIT_REPOSITORY}Tests/ ]]; then
     curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/PROJECT_NAMETests.swift > Tests/${GIT_REPOSITORY}Tests/${GIT_REPOSITORY}Tests.swift
     sed -i '' -e "s/PROJECT_NAME/${GIT_REPOSITORY}/" Tests/${GIT_REPOSITORY}Tests/${GIT_REPOSITORY}Tests.swift
     git add Tests/${GIT_REPOSITORY}Tests/${GIT_REPOSITORY}Tests.swift
+    git commit -m "initial commit"
+    git push
 fi
 
 EXIST_TAG=`git ls-remote --tags origin | tr '/' ' ' | awk -F' ' '{print $NF}' | grep $CURRENT_VERSION`
