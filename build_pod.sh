@@ -150,7 +150,7 @@ fi
 
 # JUMP VERSION
 
-PODSPEC=`${GIT_REPOSITORY}.podspec`
+PODSPEC="${GIT_REPOSITORY}.podspec"
 PREV_VERSION=`grep s.version $PODSPEC | head -1 | awk -F' ' '{print $NF}' | sed 's/"//g'`
 
 if [[ $versionChange -ne 0 ]]; then
