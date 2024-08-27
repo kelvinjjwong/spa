@@ -58,7 +58,7 @@ if [[ $? -ne 0 ]]; then
   exit -1
 fi
 
-GIT_USER="grep 'user:' ~/.config/gh/hosts.yml | awk -F': ' '{print $NF}'"
+GIT_USER="`grep 'user:' ~/.config/gh/hosts.yml | awk -F': ' '{print $NF}'`"
 GIT_BASE_BRANCH="main"
 GIT_REPOSITORY="${PWD##*/}"
 
