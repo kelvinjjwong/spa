@@ -220,12 +220,12 @@ if [[ "$GIT_BRANCH" != "$CURRENT_VERSION" ]]; then
     git checkout $CURRENT_VERSION
 fi
 git commit -am "build version $CURRENT_VERSION"
-if [[ $? -eq 0 ]]; then
+#if [[ $? -eq 0 ]]; then
     git push --set-upstream origin $CURRENT_VERSION
     if [[ $? -ne 0 ]]; then
        exit -1
     fi
-fi
+#fi
 
 # POD TESTING
 
