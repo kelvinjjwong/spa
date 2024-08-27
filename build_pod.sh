@@ -69,7 +69,7 @@ echo
 
 gh repo view $GIT_REPOSITORY
 if [[ $? -ne 0 ]]; then
-    gh repo create $GIT_REPOSITORY
+    gh repo create $GIT_REPOSITORY --public
     if [[ $? -ne 0 ]]; then
         echo "Unable to create repository in GitHub"
         exit 1
