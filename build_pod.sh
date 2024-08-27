@@ -110,18 +110,6 @@ if [[ ! -e Package.swift ]]; then
     sed -i '' -e "s/PROJECT_NAME/${GIT_REPOSITORY}/" Package.swift
 fi
 
-if [[ ! -e Sources/${GIT_REPOSITORY}/ ]]; then
-    mkdir -p Sources/${GIT_REPOSITORY}/
-    curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/PROJECT_NAME.swift > Sources/${GIT_REPOSITORY}/${GIT_REPOSITORY}.swift
-    sed -i '' -e "s/PROJECT_NAME/${GIT_REPOSITORY}/" Sources/${GIT_REPOSITORY}/${GIT_REPOSITORY}.swift
-fi
-
-if [[ ! -e Tests/${GIT_REPOSITORY}Tests/ ]]; then
-    mkdir -p Tests/${GIT_REPOSITORY}Tests/
-    curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/PROJECT_NAMETests.swift > Tests/${GIT_REPOSITORY}Tests/${GIT_REPOSITORY}Tests.swift
-    sed -i '' -e "s/PROJECT_NAME/${GIT_REPOSITORY}/" Tests/${GIT_REPOSITORY}Tests/${GIT_REPOSITORY}Tests.swift
-fi
-
 git status
 if [[ $? -ne 0 ]]; then
     git init
@@ -202,6 +190,20 @@ if [ "$GIT_REMOTE_REPO" = "" ]; then
     git push -u origin ${GIT_BASE_BRANCH}
 fi
 
+if [[ ! -e Sources/${GIT_REPOSITORY}/ ]]; then
+    mkdir -p Sources/${GIT_REPOSITORY}/
+    curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/PROJECT_NAME.swift > Sources/${GIT_REPOSITORY}/${GIT_REPOSITORY}.swift
+    sed -i '' -e "s/PROJECT_NAME/${GIT_REPOSITORY}/" Sources/${GIT_REPOSITORY}/${GIT_REPOSITORY}.swift
+    git add Sources/${GIT_REPOSITORY}/${GIT_REPOSITORY}.swift
+fi
+
+if [[ ! -e Tests/${GIT_REPOSITORY}Tests/ ]]; then
+    mkdir -p Tests/${GIT_REPOSITORY}Tests/
+    curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/PROJECT_NAMETests.swift > Tests/${GIT_REPOSITORY}Tests/${GIT_REPOSITORY}Tests.swift
+    sed -i '' -e "s/PROJECT_NAME/${GIT_REPOSITORY}/" Tests/${GIT_REPOSITORY}Tests/${GIT_REPOSITORY}Tests.swift
+    git add Tests/${GIT_REPOSITORY}Tests/${GIT_REPOSITORY}Tests.swift
+fi
+
 EXIST_TAG=`git ls-remote --tags origin | tr '/' ' ' | awk -F' ' '{print $NF}' | grep $CURRENT_VERSION`
 if [[ "$EXIST_TAG" != "" ]]; then
     echo "$CURRENT_VERSION already exist in git repository. Aborted following build steps to avoid duplication."
@@ -220,7 +222,10 @@ if [[ $? -eq 0 ]]; then
        exit -1
     fi
 else
-    exit $?
+    echo 
+    echo "You need to 'git add' and 'git commit' ALL untracked files before perform testing."
+    echo
+    exit 1
 fi
 
 # POD TESTING
