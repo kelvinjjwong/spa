@@ -221,7 +221,9 @@ if [[ "$EXIST_TAG" != "" ]]; then
     exit -1
 fi
 
+NEW_BRANCH=0
 if [[ "$GIT_BRANCH" != "$CURRENT_VERSION" ]]; then
+    NEW_BRANCH=1
     git branch $CURRENT_VERSION
     git checkout $CURRENT_VERSION
 fi
@@ -243,6 +245,13 @@ fi
 if [[ $IS_TEST -ne 0 ]]; then
     echo
     echo "Test only, abort release procedure."
+    echo
+    echo "Clean new version branch $CURRENT_VERSION :"
+    if [[ $NEW_BRANCH -ne 0 ]]; then
+        git checkout $GIT_BRANCH
+        git branch -d $CURRENT_VERSION
+        git push origin -d $CURRENT_VERSION
+    fi
     exit 0
 fi
 
