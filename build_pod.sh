@@ -65,6 +65,12 @@ GIT_USER="`grep 'user:' ~/.config/gh/hosts.yml | awk -F': ' '{print $NF}'`"
 GIT_BASE_BRANCH="main"
 GIT_REPOSITORY="${PWD##*/}"
 
+REQUIRE_UPPERCASE=`echo ${PWD##*/} | awk '{for (i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)} 1'`
+
+if [[ "$REQUIRE_UPPERCASE" != "$GIT_REPOSITORY" ]]; then
+    GIT_REPOSITORY=$REQUIRE_UPPERCASE
+fi
+
 echo "git username:    $GIT_USER"
 echo "git repository:  $GIT_REPOSITORY"
 echo "git base branch: $GIT_BASE_BRANCH"
