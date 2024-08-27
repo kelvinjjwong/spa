@@ -1,17 +1,13 @@
 #!/bin/bash
-if [[ "$1" = "help" ]] || [[ "$1" = "--help" ]]  || [[ "$1" = "--?" ]]; then
+if [[ "$1" = "" ]] || [[ "$1" = "help" ]] || [[ "$1" = "--help" ]]  || [[ "$1" = "--?" ]]; then
    echo "Sample:"
-   echo "./build_pod.sh test"
+   echo "$0"
    echo
-   echo "./build_pod.sh"
-   echo "./build_pod.sh version up"
-   echo "./build_pod.sh version up major"
-   echo "./build_pod.sh version up minor"
-   echo "./build_pod.sh version up revision"
-   echo "./build_pod.sh version down"
-   echo "./build_pod.sh version down major"
-   echo "./build_pod.sh version down minor"
-   echo "./build_pod.sh version down revision"
+   echo "$0 test"
+   echo "$0 release"
+   echo "$0 release major"
+   echo "$0 release minor"
+   echo "$0 release revision"
    echo
    exit 0
 fi
@@ -129,28 +125,27 @@ fi
 
 versionPos="revision"
 versionChange=0
-if [[ "$1 $2" = "version up" ]]; then
+if [[ "$1" = "release" ]]; then
    versionChange=1
-   if [[ "$3" = "major" ]]; then
+   if [[ "$2" = "major" ]]; then
        versionPos="major"
-   elif [[ "$3" = "minor" ]]; then
+   elif [[ "$2" = "minor" ]]; then
        versionPos="minor"
    else
        versionPos="revision"
    fi
 fi
 
-if [[ "$1 $2" = "version down" ]]; then
-   versionChange=-1
-   if [[ "$3" = "major" ]]; then
-       versionPos="major"
-   elif [[ "$3" = "minor" ]]; then
-       versionPos="minor"
-   else
-       versionPos="revision"
-   fi
-fi
-
+#if [[ "$1 $2" = "version down" ]]; then
+#   versionChange=-1
+#   if [[ "$3" = "major" ]]; then
+#       versionPos="major"
+#   elif [[ "$3" = "minor" ]]; then
+#       versionPos="minor"
+#   else
+#       versionPos="revision"
+#   fi
+#fi
 
 
 # JUMP VERSION
