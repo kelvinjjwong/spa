@@ -81,10 +81,14 @@ if [[ ! -e README.md ]]; then
 fi
 
 if [[ ! -e LICENSE ]]; then
-    curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/LICENSE >> LICENSE
-    sed -i -e "s/kelvinjjwong/${GIT_USER}/" LICENSE
+    curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/LICENSE > LICENSE
+    sed -ie "s/kelvinjjwong/${GIT_USER}/" LICENSE
     CURYEAR=`date '+%Y'`
-    sed -i -e "s/2024/${CURYEAR}/" LICENSE
+    sed -ie "s/2024/${CURYEAR}/" LICENSE
+fi
+
+if [[ ! -e .gitignore ]]; then
+    curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/.gitignore > .gitignore
 fi
 
 git status
@@ -157,8 +161,8 @@ if [[ $versionChange -ne 0 ]]; then
     fi
     echo "Current version: $PREV_VERSION"
     echo "   Next version: $NEW_VERSION"
-    sed -i .bak -e 's/s.version     = ".*"/s.version     = "'$NEW_VERSION'"/' $PODSPEC; rm -f $PODSPEC.bak
-    sed -i .bak -e 's/"'$PREV_VERSION'"/"'$NEW_VERSION'"/g' -e 's/~> '$PREV_VERSION'/~> '$NEW_VERSION'/g' README.md; rm -f README.md.bak
+    sed -ie 's/s.version     = ".*"/s.version     = "'$NEW_VERSION'"/' $PODSPEC
+    sed -ie 's/"'$PREV_VERSION'"/"'$NEW_VERSION'"/g' -e 's/~> '$PREV_VERSION'/~> '$NEW_VERSION'/g' README.md
 fi
 
 # PUSH CHANGES BEFORE POD TESTING
@@ -190,6 +194,8 @@ if [[ $? -eq 0 ]]; then
     if [[ $? -ne 0 ]]; then
        exit -1
     fi
+else
+    exit $?
 fi
 
 # POD TESTING
