@@ -90,6 +90,11 @@ if [[ $? -ne 0 ]]; then
     git push -u origin ${GIT_BASE_BRANCH}
 fi
 
+if [[ ! -e ${GIT_REPOSITORY}.podspec ]] || [[ ! -e Package.swift ]]; then
+    echo "Need Package.swift or ${GIT_REPOSITORY}.podspec to continue, please create either one first."
+    exit 1;
+fi
+
 versionPos="revision"
 versionChange=0
 if [[ "$1 $2" = "version up" ]]; then
