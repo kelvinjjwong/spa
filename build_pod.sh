@@ -111,7 +111,7 @@ fi
 
 if [[ ! -e Package.swift ]]; then
     curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/Package.swift > Package.swift
-     -e "s/PROJECT_NAME/${GIT_REPOSITORY}/" ${GIT_REPOSITORY}.podspec
+    sed -i '' -e "s/PROJECT_NAME/${GIT_REPOSITORY}/" Package.swift
 fi
 
 git status
