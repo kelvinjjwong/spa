@@ -80,6 +80,13 @@ if [[ ! -e README.md ]]; then
     echo "# ${GIT_REPOSITORY}" >> README.md
 fi
 
+if [[ ! -e LICENSE ]]; then
+    curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/LICENSE >> LICENSE
+    sed -i -e "s/kelvinjjwong/${GIT_USER}/" LICENSE
+    CURYEAR=`date '+%Y'`
+    sed -i -e "s/2024/${CURYEAR}/" LICENSE
+fi
+
 git status
 if [[ $? -ne 0 ]]; then
     git init
