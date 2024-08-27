@@ -1,0 +1,7 @@
+#!/bin/bash
+rm -rf spa
+mkdir -p spa
+git clone https://github.com/kelvinjjwong/spa.git spa
+cp spa/*.sh .
+rm -rf spa
+echo done.
