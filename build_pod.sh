@@ -1,6 +1,9 @@
 #!/bin/bash
 #Version:1.0.1
-if [[ "$1" = "" ]] || [[ "$1" = "help" ]] || [[ "$1" = "--help" ]]  || [[ "$1" = "--?" ]]; then
+SCRIPT_VERSION=`grep "Version:" $0 | head -1 | awk -F':' '{print $NF}'`
+echo "Current SPA VERSION: $SCRIPT_VERSION"
+echo 
+if [[ "$1" = "" ]] || [[ "$1" = "help" ]] || [[ "$1" = "--help" ]]  || [[ "$1" = "--?" ]]; then   
    echo "Sample:"
    echo "$0"
    echo
@@ -17,6 +20,19 @@ IS_TEST=0
 if [[ "$1" = "test" ]]; then
   IS_TEST=1
 fi
+
+if [[ "`which gh`" == "" ]]; then
+    echo "GitHub CLI is required but has not properly installed."
+    echo "https://cli.github.com"
+    exit 1;
+fi
+SCRIPT_LATEST_VERSION=`gh release list --repo kelvinjjwong/spa --order desc --limit 1 | grep Latest | awk -F' ' '{print $1}'`
+if [[ "$SCRIPT_LATEST_VERSION" != "$SCRIPT_VERSION" ]]; then
+    echo "Latest SPA VERSION is $SCRIPT_LATEST_VERSION , suggest update."
+    echo
+fi
+
+gh --version
 
 xcodebuild -version
 if [[ $? -ne 0 ]]; then
@@ -35,14 +51,6 @@ if [[ "`which xcodebuild`" == "" ]] || [[ "`which xcode-select`" == "" ]]; then
     echo "Xcode is required but has not properly installed."
     echo "https://apps.apple.com/us/app/xcode/id497799835?mt=12"
     exit 1;
-fi
-
-if [[ "`which gh`" == "" ]]; then
-    echo "GitHub CLI is required but has not properly installed."
-    echo "https://cli.github.com"
-    exit 1;
-else
-    gh --version
 fi
 
 if [[ "`which pod`" == "" ]]; then
