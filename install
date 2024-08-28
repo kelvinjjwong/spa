@@ -1,8 +1,8 @@
 #!/bin/bash
-rm -rf ~spa
-mkdir -p ~spa
-git clone https://github.com/kelvinjjwong/spa.git ~spa
-cp ~spa/*.sh .
+rm -rf _spa
+mkdir -p _spa
+git clone https://github.com/kelvinjjwong/spa.git _spa
+cp _spa/*.sh .
 chmod +x *.sh
-rm -rf ~spa
+rm -rf _spa
 echo done.
