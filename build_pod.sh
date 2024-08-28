@@ -1,4 +1,5 @@
 #!/bin/bash
+#Version:1.0.0
 if [[ "$1" = "" ]] || [[ "$1" = "help" ]] || [[ "$1" = "--help" ]]  || [[ "$1" = "--?" ]]; then
    echo "Sample:"
    echo "$0"
