@@ -1,5 +1,5 @@
 #!/bin/bash
-#Version:1.0.4
+#Version:1.0.5
 SCRIPT_VERSION=`grep "Version:" $0 | head -1 | awk -F':' '{print $NF}'`
 echo "Current SPA VERSION: $SCRIPT_VERSION"
 echo 
