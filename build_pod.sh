@@ -7,6 +7,7 @@ if [[ "$1" = "" ]] || [[ "$1" = "help" ]] || [[ "$1" = "--help" ]]  || [[ "$1" =
    echo "Sample:"
    echo "$0"
    echo
+   echo "$0 init"
    echo "$0 test"
    echo "$0 release"
    echo "$0 release major"
@@ -14,6 +15,11 @@ if [[ "$1" = "" ]] || [[ "$1" = "help" ]] || [[ "$1" = "--help" ]]  || [[ "$1" =
    echo "$0 release revision"
    echo
    exit 0
+fi
+
+IS_INIT=0
+if [[ "$1" = "init" ]]; then
+  IS_INIT=1
 fi
 
 IS_TEST=0
@@ -138,6 +144,31 @@ if [[ $? -ne 0 ]]; then
     fi
 fi
 
+if [[ ! -e Sources/${GIT_REPOSITORY}/ ]]; then
+    mkdir -p Sources/${GIT_REPOSITORY}/
+    curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/PROJECT_NAME.swift > Sources/${GIT_REPOSITORY}/${GIT_REPOSITORY}.swift
+    sed -i '' -e "s/PROJECT_NAME/${GIT_REPOSITORY}/" Sources/${GIT_REPOSITORY}/${GIT_REPOSITORY}.swift
+    git add Sources/${GIT_REPOSITORY}/${GIT_REPOSITORY}.swift
+    git commit -m "initial commit"
+    git push
+fi
+
+if [[ ! -e Tests/${GIT_REPOSITORY}Tests/ ]]; then
+    mkdir -p Tests/${GIT_REPOSITORY}Tests/
+    curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/PROJECT_NAMETests.swift > Tests/${GIT_REPOSITORY}Tests/${GIT_REPOSITORY}Tests.swift
+    sed -i '' -e "s/PROJECT_NAME/${GIT_REPOSITORY}/" Tests/${GIT_REPOSITORY}Tests/${GIT_REPOSITORY}Tests.swift
+    git add Tests/${GIT_REPOSITORY}Tests/${GIT_REPOSITORY}Tests.swift
+    git commit -m "initial commit"
+    git push
+fi
+
+if [[ $IS_INIT -eq 1 ]]; then
+    echo "Completed init."
+    exit 0
+fi
+
+# CALCULATE VERSION
+
 versionPos="revision"
 versionChange=0
 if [[ "$1" = "release" ]]; then
@@ -203,24 +234,6 @@ if [ "$GIT_REMOTE_REPO" = "" ]; then
     git remote add origin git@github.com:${GIT_USER}/${GIT_REPOSITORY}.git
     git branch -M ${GIT_BASE_BRANCH}
     git push -u origin ${GIT_BASE_BRANCH}
-fi
-
-if [[ ! -e Sources/${GIT_REPOSITORY}/ ]]; then
-    mkdir -p Sources/${GIT_REPOSITORY}/
-    curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/PROJECT_NAME.swift > Sources/${GIT_REPOSITORY}/${GIT_REPOSITORY}.swift
-    sed -i '' -e "s/PROJECT_NAME/${GIT_REPOSITORY}/" Sources/${GIT_REPOSITORY}/${GIT_REPOSITORY}.swift
-    git add Sources/${GIT_REPOSITORY}/${GIT_REPOSITORY}.swift
-    git commit -m "initial commit"
-    git push
-fi
-
-if [[ ! -e Tests/${GIT_REPOSITORY}Tests/ ]]; then
-    mkdir -p Tests/${GIT_REPOSITORY}Tests/
-    curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/PROJECT_NAMETests.swift > Tests/${GIT_REPOSITORY}Tests/${GIT_REPOSITORY}Tests.swift
-    sed -i '' -e "s/PROJECT_NAME/${GIT_REPOSITORY}/" Tests/${GIT_REPOSITORY}Tests/${GIT_REPOSITORY}Tests.swift
-    git add Tests/${GIT_REPOSITORY}Tests/${GIT_REPOSITORY}Tests.swift
-    git commit -m "initial commit"
-    git push
 fi
 
 EXIST_TAG=`git ls-remote --tags origin | tr '/' ' ' | awk -F' ' '{print $NF}' | grep $CURRENT_VERSION`
