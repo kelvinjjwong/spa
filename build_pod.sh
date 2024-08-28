@@ -85,7 +85,7 @@ echo "git repository:  $GIT_REPOSITORY"
 echo "git base branch: $GIT_BASE_BRANCH"
 echo
 
-gh repo view $GIT_REPOSITORY
+gh repo view $GIT_REPOSITORY --json name,description,latestRelease,url,sshUrl,updatedAt
 if [[ $? -ne 0 ]]; then
     gh repo create $GIT_REPOSITORY --public
     if [[ $? -ne 0 ]]; then
@@ -94,22 +94,22 @@ if [[ $? -ne 0 ]]; then
     fi
 fi
 
-if [[ ! -e README.md ]]; then
+if [[ ! -e README.md ]] || [[ `stat -f "%z" README.md` -eq 0 ]]; then
     echo "# ${GIT_REPOSITORY}" >> README.md
 fi
 
-if [[ ! -e LICENSE ]]; then
+if [[ ! -e LICENSE ]] || [[ `stat -f "%z" LICENSE` -eq 0 ]]; then
     curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/LICENSE > LICENSE
     sed -i '' -e "s/kelvinjjwong/${GIT_USER}/" LICENSE
     CURYEAR=`date '+%Y'`
     sed -i '' -e "s/2024/${CURYEAR}/" LICENSE
 fi
 
-if [[ ! -e .gitignore ]]; then
+if [[ ! -e .gitignore ]] || [[ `stat -f "%z" .gitignore` -eq 0 ]]; then
     curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/.gitignore > .gitignore
 fi
 
-if [[ ! -e ${GIT_REPOSITORY}.podspec ]]; then
+if [[ ! -e ${GIT_REPOSITORY}.podspec ]] || [[ `stat -f "%z" ${GIT_REPOSITORY}.podspec` -eq 0 ]]; then
     curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/podspec > ${GIT_REPOSITORY}.podspec
     sed -i '' -e "s/PROJECT_NAME/${GIT_REPOSITORY}/" ${GIT_REPOSITORY}.podspec
     sed -i '' -e "s/PROJECT_VERSION/1.0.0/" ${GIT_REPOSITORY}.podspec
@@ -120,7 +120,7 @@ if [[ ! -e ${GIT_REPOSITORY}.podspec ]]; then
     sed -i '' -e "s/SWIFT_VERSION/5.0/" ${GIT_REPOSITORY}.podspec
 fi
 
-if [[ ! -e Package.swift ]]; then
+if [[ ! -e Package.swift ]] || [[ `stat -f "%z" Package.swift` -eq 0 ]]; then
     curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/Package.swift > Package.swift
     sed -i '' -e "s/PROJECT_NAME/${GIT_REPOSITORY}/" Package.swift
 fi

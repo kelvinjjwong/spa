@@ -32,7 +32,7 @@ GIT_BASE_BRANCH="main"
 GIT_REPOSITORY="${PWD##*/}"
 
 
-gh repo view $GIT_REPOSITORY
+gh repo view $GIT_REPOSITORY --json name,description,latestRelease,url,sshUrl,updatedAt
 if [[ $? -ne 0 ]]; then
     gh repo create $GIT_REPOSITORY --public
     if [[ $? -ne 0 ]]; then
@@ -87,7 +87,6 @@ fi
 
 # JUMP VERSION
 
-PODSPEC="${GIT_REPOSITORY}.podspec"
 PREV_VERSION=`grep "Version:" build_pod.sh | head -1 | awk -F':' '{print $NF}'`
 
 if [[ $versionChange -ne 0 ]]; then
