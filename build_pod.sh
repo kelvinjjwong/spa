@@ -9,10 +9,7 @@ if [[ "$1" = "" ]] || [[ "$1" = "help" ]] || [[ "$1" = "--help" ]]  || [[ "$1" =
    echo
    echo "$0 init"
    echo "$0 test"
-   echo "$0 release"
-   echo "$0 release major"
-   echo "$0 release minor"
-   echo "$0 release revision"
+   echo "$0 release [major|minor|revision] [not-publish]"
    echo
    exit 0
 fi
@@ -102,6 +99,7 @@ fi
 
 if [[ ! -e README.md ]] || [[ `stat -f "%z" README.md` -eq 0 ]]; then
     echo "# ${GIT_REPOSITORY}" >> README.md
+    echo "Completed create README.md"
 fi
 
 if [[ ! -e LICENSE ]] || [[ `stat -f "%z" LICENSE` -eq 0 ]]; then
@@ -109,10 +107,12 @@ if [[ ! -e LICENSE ]] || [[ `stat -f "%z" LICENSE` -eq 0 ]]; then
     sed -i '' -e "s/kelvinjjwong/${GIT_USER}/" LICENSE
     CURYEAR=`date '+%Y'`
     sed -i '' -e "s/2024/${CURYEAR}/" LICENSE
+    echo "Completed create LICENSE"
 fi
 
 if [[ ! -e .gitignore ]] || [[ `stat -f "%z" .gitignore` -eq 0 ]]; then
     curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/.gitignore > .gitignore
+    echo "Completed create .gitignore"
 fi
 
 if [[ ! -e ${GIT_REPOSITORY}.podspec ]] || [[ `stat -f "%z" ${GIT_REPOSITORY}.podspec` -eq 0 ]]; then
@@ -124,17 +124,28 @@ if [[ ! -e ${GIT_REPOSITORY}.podspec ]] || [[ `stat -f "%z" ${GIT_REPOSITORY}.po
     MACOS_VERSION=`sw_vers | grep ProductVersion | awk -F' ' '{print $NF}' | awk -F'.' '{print $1".0"}'`
     sed -i '' -e "s/MACOS_VERSION/${MACOS_VERSION}/" ${GIT_REPOSITORY}.podspec
     sed -i '' -e "s/SWIFT_VERSION/5.0/" ${GIT_REPOSITORY}.podspec
+    echo "Completed create ${GIT_REPOSITORY}.podspec"
 fi
 
 if [[ ! -e Package.swift ]] || [[ `stat -f "%z" Package.swift` -eq 0 ]]; then
     curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/Package.swift > Package.swift
     sed -i '' -e "s/PROJECT_NAME/${GIT_REPOSITORY}/" Package.swift
+    echo "Completed create Package.swift"
 fi
 
 git status
 if [[ $? -ne 0 ]]; then
     git init
     git add -A
+    git branch -M ${GIT_BASE_BRANCH}
+    git remote add origin git@github.com:${GIT_USER}/${GIT_REPOSITORY}.git
+    git commit -m "initial commit"
+    git push -u origin ${GIT_BASE_BRANCH}
+    if [[ $? -ne 0 ]]; then
+        exit $?
+    fi
+fi
+if [[ "`git config --get remote.origin.url`" = "" ]]; then
     git branch -M ${GIT_BASE_BRANCH}
     git remote add origin git@github.com:${GIT_USER}/${GIT_REPOSITORY}.git
     git commit -m "initial commit"
@@ -151,6 +162,7 @@ if [[ ! -e Sources/${GIT_REPOSITORY}/ ]]; then
     git add Sources/${GIT_REPOSITORY}/${GIT_REPOSITORY}.swift
     git commit -m "initial commit"
     git push
+    echo "Completed create Sources/${GIT_REPOSITORY}/${GIT_REPOSITORY}.swift"
 fi
 
 if [[ ! -e Tests/${GIT_REPOSITORY}Tests/ ]]; then
@@ -160,6 +172,7 @@ if [[ ! -e Tests/${GIT_REPOSITORY}Tests/ ]]; then
     git add Tests/${GIT_REPOSITORY}Tests/${GIT_REPOSITORY}Tests.swift
     git commit -m "initial commit"
     git push
+    echo "Completed create Tests/${GIT_REPOSITORY}Tests/${GIT_REPOSITORY}Tests.swift"
 fi
 
 if [[ $IS_INIT -eq 1 ]]; then
@@ -279,43 +292,27 @@ fi
 
 # RELEASE
 
-GH=`which gh`
-if [[ "$GH" != "" ]]; then
-    gh pr status
-    gh pr create --title "$CURRENT_VERSION" --body "**Full Changelog**: https://github.com/${GIT_USER}/${GIT_REPOSITORY}/compare/$PREV_VERSION...$CURRENT_VERSION"
-    gh pr list
-    GH_PR=`gh pr list | tail -1 | tr '#' ' ' | awk -F' ' '{print $1}'`
-    gh pr merge $GH_PR -m
-    if [[ $? -ne 0 ]]; then
-        exit -1
-    fi
-    gh pr status
-    git pull
-    git checkout ${GIT_BASE_BRANCH}
-    git pull
-    gh release create $CURRENT_VERSION --generate-notes
-    if [[ $? -ne 0 ]]; then
-        exit -1
-    fi
-    
-    pod trunk push $PODSPEC --allow-warnings
-else
-    SOURCE_URL=`grep s.source $PODSPEC | head -1 | awk -F'"' '{print $2}' | sed 's/.\{4\}$//'`
-    echo "If success, you can then:"
-    echo
-    echo "1 # publish new release by tagging new version [$CURRENT_VERSION] in git repository"
-    echo "$SOURCE_URL/releases"
-    echo "with auto markdown release note"
-    echo "**Full Changelog**: $SOURCE_URL/compare/$PREV_VERSION...$CURRENT_VERSION"
-    echo ""
-    echo "2 # push new version to Cocoapods trunk"
-    echo "pod trunk push $PODSPEC"
-    echo
-    echo "OR install GitHub CLI to automate these steps:"
-    echo
-    echo "brew install gh"
-    echo "gh auth login"
-    echo
-    echo "https://cli.github.com"
-    echo
+gh pr status
+gh pr create --title "$CURRENT_VERSION" --body "**Full Changelog**: https://github.com/${GIT_USER}/${GIT_REPOSITORY}/compare/$PREV_VERSION...$CURRENT_VERSION"
+gh pr list
+GH_PR=`gh pr list | tail -1 | tr '#' ' ' | awk -F' ' '{print $1}'`
+gh pr merge $GH_PR -m
+if [[ $? -ne 0 ]]; then
+    exit -1
 fi
+gh pr status
+git pull
+git checkout ${GIT_BASE_BRANCH}
+git pull
+gh release create $CURRENT_VERSION --generate-notes
+if [[ $? -ne 0 ]]; then
+    exit -1
+fi
+echo "Completed release in GitHub."
+
+if [[ "$2" = "not-publish" ]] || [[ "$3" = "not-publish" ]]; then
+    exit 0
+fi
+
+pod trunk push $PODSPEC --allow-warnings
+echo "Completed publish to Cocoapods trunk."
