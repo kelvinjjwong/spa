@@ -80,7 +80,14 @@ if [[ "$GIT_BASE_BRANCH" = "" ]]; then
     GIT_BASE_BRANCH="main"
 fi
 
-REQUIRE_UPPERCASE=`echo ${PWD##*/} | awk '{for (i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)} 1'`
+IS_HYPHEN=0
+if [[ $GIT_REPOSITORY == *-* ]]
+then
+    IS_HYPHEN=1
+    REQUIRE_UPPERCASE=$GIT_REPOSITORY
+else
+    REQUIRE_UPPERCASE=`echo ${PWD##*/} | awk '{for (i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)} 1'`
+fi
 
 if [[ "$REQUIRE_UPPERCASE" != "$GIT_REPOSITORY" ]]; then
     GIT_REPOSITORY=$REQUIRE_UPPERCASE
@@ -158,24 +165,28 @@ if [[ "`git config --get remote.origin.url`" = "" ]]; then
     fi
 fi
 
-if [[ ! -e Sources/${GIT_REPOSITORY}/ ]]; then
-    mkdir -p Sources/${GIT_REPOSITORY}/
-    curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/PROJECT_NAME.swift > Sources/${GIT_REPOSITORY}/${GIT_REPOSITORY}.swift
-    sed -i '' -e "s/PROJECT_NAME/${GIT_REPOSITORY}/" Sources/${GIT_REPOSITORY}/${GIT_REPOSITORY}.swift
-    git add Sources/${GIT_REPOSITORY}/${GIT_REPOSITORY}.swift
-    git commit -m "initial commit"
-    git push
-    echo "Completed create Sources/${GIT_REPOSITORY}/${GIT_REPOSITORY}.swift"
-fi
+if [[ $IS_HYPHEN -eq 0 ]]; then
 
-if [[ ! -e Tests/${GIT_REPOSITORY}Tests/ ]]; then
-    mkdir -p Tests/${GIT_REPOSITORY}Tests/
-    curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/PROJECT_NAMETests.swift > Tests/${GIT_REPOSITORY}Tests/${GIT_REPOSITORY}Tests.swift
-    sed -i '' -e "s/PROJECT_NAME/${GIT_REPOSITORY}/" Tests/${GIT_REPOSITORY}Tests/${GIT_REPOSITORY}Tests.swift
-    git add Tests/${GIT_REPOSITORY}Tests/${GIT_REPOSITORY}Tests.swift
-    git commit -m "initial commit"
-    git push
-    echo "Completed create Tests/${GIT_REPOSITORY}Tests/${GIT_REPOSITORY}Tests.swift"
+    if [[ ! -e Sources/${GIT_REPOSITORY}/ ]]; then
+        mkdir -p Sources/${GIT_REPOSITORY}/
+        curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/PROJECT_NAME.swift > Sources/${GIT_REPOSITORY}/${GIT_REPOSITORY}.swift
+        sed -i '' -e "s/PROJECT_NAME/${GIT_REPOSITORY}/" Sources/${GIT_REPOSITORY}/${GIT_REPOSITORY}.swift
+        git add Sources/${GIT_REPOSITORY}/${GIT_REPOSITORY}.swift
+        git commit -m "initial commit"
+        git push
+        echo "Completed create Sources/${GIT_REPOSITORY}/${GIT_REPOSITORY}.swift"
+    fi
+
+    if [[ ! -e Tests/${GIT_REPOSITORY}Tests/ ]]; then
+        mkdir -p Tests/${GIT_REPOSITORY}Tests/
+        curl -fsSL https://raw.githubusercontent.com/kelvinjjwong/spa/main/template/PROJECT_NAMETests.swift > Tests/${GIT_REPOSITORY}Tests/${GIT_REPOSITORY}Tests.swift
+        sed -i '' -e "s/PROJECT_NAME/${GIT_REPOSITORY}/" Tests/${GIT_REPOSITORY}Tests/${GIT_REPOSITORY}Tests.swift
+        git add Tests/${GIT_REPOSITORY}Tests/${GIT_REPOSITORY}Tests.swift
+        git commit -m "initial commit"
+        git push
+        echo "Completed create Tests/${GIT_REPOSITORY}Tests/${GIT_REPOSITORY}Tests.swift"
+    fi
+
 fi
 
 if [[ $IS_INIT -eq 1 ]]; then
