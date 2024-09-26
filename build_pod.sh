@@ -68,7 +68,7 @@ pod trunk me
 if [[ $? -ne 0 ]]; then
   echo "Please register like below before retry: "
   echo
-  echo "pod trunk register `defaults read MobileMeAccounts Accounts | grep AccountDescription | awk -F'\"' '{print $2}'` '`whoami`' --description='`hostname -s`'"
+  echo "pod trunk register `defaults read MobileMeAccounts Accounts | grep AccountID | awk -F'\"' '{print $2}'` '`whoami`' --description='`hostname -s`'"
   echo
   exit -1
 fi
